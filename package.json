@@ -12,17 +12,18 @@
     "test": "cross-env NODE_ENV=test jest --runInBand"
   },
   "dependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.11.0",
     "axios": "^1.6.0",
     "dotenv": "^16.4.0",
     "express": "^4.19.2",
     "knex": "^3.1.0",
     "mysql2": "^3.9.0",
+    "typescript": "^5.5.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.0",
     "@types/supertest": "^6.0.2",
     "better-sqlite3": "^11.7.0",
     "cross-env": "^7.0.3",
@@ -30,7 +31,6 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.4"
+    "ts-node-dev": "^2.0.0"
   }
 }
