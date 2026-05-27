@@ -8,6 +8,7 @@ A TypeScript Node.js wallet MVP for the Demo Credit mobile lending assessment. B
 - [Design Goals](#design-goals)
 - [Architecture](#architecture)
 - [Data Model](#data-model)
+- [E-R Diagram](#e-r-diagram)
 - [Authentication](#authentication)
 - [Karma Blacklist Integration](#karma-blacklist-integration)
 - [Wallet Operations](#wallet-operations)
@@ -108,6 +109,51 @@ Immutable ledger entries for wallet activity.
 | `amount` | decimal(14,2) | Transaction amount |
 | `counterparty_wallet_id` | integer nullable | Other wallet involved in transfers |
 | `created_at` / `updated_at` | timestamp | Audit timestamps |
+
+## E-R Diagram
+
+```mermaid
+erDiagram
+    users ||--|| wallets : "has one"
+    wallets ||--o{ transactions : "ledger (wallet_id)"
+    wallets ||--o| transactions : "transfer peer (counterparty_wallet_id)"
+
+    users {
+        int id PK
+        string name
+        string email UK
+        string phone
+        string bvn
+        string access_token UK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    wallets {
+        int id PK
+        int user_id FK UK
+        decimal balance
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    transactions {
+        int id PK
+        int wallet_id FK
+        string type
+        decimal amount
+        string reference
+        int counterparty_wallet_id FK "nullable"
+        timestamp created_at
+        timestamp updated_at
+    }
+```
+
+Each borrower is a **user** with exactly **one wallet** (`user_id` is unique on `wallets`). Every fund, withdraw, or transfer writes one or more **transactions** against that wallet. Peer-to-peer transfers link the two sides via `counterparty_wallet_id` (set on `transfer_out` / `transfer_in` rows; null for fund and withdraw).
+
+Relationship summary: **users (1) → (1) wallets → (many) transactions**, with `counterparty_wallet_id` pointing at the other wallet on transfers.
+
+> Optional: export a PNG/SVG from [dbdesigner.net](https://dbdesigner.net) and save as `docs/er-diagram.png`, then add `![E-R Diagram](./docs/er-diagram.png)` above the Mermaid block.
 
 ## Authentication
 
