@@ -1,0 +1,15 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: demo-credit-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo_credit_wallet
+    ports:
+      - "3306:3306"
+    volumes:
+      - demo_credit_mysql_data:/var/lib/mysql
+
+volumes:
+  demo_credit_mysql_data:
