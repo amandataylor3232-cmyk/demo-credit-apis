@@ -115,7 +115,9 @@ Immutable ledger entries for wallet activity.
 
 The schema was modeled in [DB Designer](https://app.dbdesigner.net/). You can open or extend the same design by importing [`docs/er-diagram.sql`](./docs/er-diagram.sql) (**Import → SQL** in the designer).
 
-![Demo Credit Wallet E-R Diagram](./docs/er-diagram.svg)
+![Demo Credit Wallet E-R Diagram](./docs/er-diagram.png)
+
+> GitHub and many Markdown previews block `.svg` images in READMEs, so the diagram is committed as PNG. The editable vector source is [`docs/er-diagram.svg`](./docs/er-diagram.svg).
 
 | Relationship | Cardinality | Description |
 | --- | --- | --- |
