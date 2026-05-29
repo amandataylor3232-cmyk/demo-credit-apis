@@ -146,16 +146,16 @@ erDiagram
         string phone
         string bvn
         string access_token UK
-        timestamp created_at
-        timestamp updated_at
+        datetime created_at
+        datetime updated_at
     }
 
     wallets {
         int id PK
-        int user_id FK UK
+        int user_id FK
         decimal balance
-        timestamp created_at
-        timestamp updated_at
+        datetime created_at
+        datetime updated_at
     }
 
     transactions {
@@ -164,9 +164,9 @@ erDiagram
         string type
         decimal amount
         string reference
-        int counterparty_wallet_id FK "nullable"
-        timestamp created_at
-        timestamp updated_at
+        int counterparty_wallet_id FK
+        datetime created_at
+        datetime updated_at
     }
 ```
 
