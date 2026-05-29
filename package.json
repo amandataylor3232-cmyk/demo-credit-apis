@@ -10,6 +10,7 @@
     "migrate:prod": "knex migrate:latest --knexfile dist/db/knexfile.js",
     "migrate:rollback": "knex migrate:rollback --knexfile src/db/knexfile.ts",
     "db:create": "ts-node src/scripts/create-database.ts",
+    "db:check": "ts-node src/scripts/check-database.ts",
     "test": "cross-env NODE_ENV=test jest --runInBand"
   },
   "dependencies": {

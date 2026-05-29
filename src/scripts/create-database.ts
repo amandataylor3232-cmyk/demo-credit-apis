@@ -1,13 +1,9 @@
 import mysql from 'mysql2/promise';
 import { env } from '../config/env';
+import { getMysqlConnectionOptions } from '../db/mysql-connection';
 
 const run = async (): Promise<void> => {
-  const connection = await mysql.createConnection({
-    host: env.db.host,
-    port: env.db.port,
-    user: env.db.user,
-    password: env.db.password,
-  });
+  const connection = await mysql.createConnection(getMysqlConnectionOptions(false));
 
   await connection.query(
     `CREATE DATABASE IF NOT EXISTS \`${env.db.name}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`

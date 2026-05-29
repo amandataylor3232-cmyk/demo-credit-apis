@@ -18,5 +18,6 @@ export const env = {
     password: process.env.DB_PASSWORD ?? '',
     name: process.env.DB_NAME ?? 'demo_credit_wallet',
     ssl: process.env.DB_SSL === 'true',
+    sslCa: process.env.DB_SSL_CA ?? '',
   },
 };

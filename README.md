@@ -107,10 +107,31 @@ Immutable ledger entries for wallet activity.
 | `wallet_id` | integer | FK to `wallets.id` |
 | `type` | enum-like string | `fund`, `withdraw`, `transfer_in`, `transfer_out` |
 | `amount` | decimal(14,2) | Transaction amount |
+| `reference` | string nullable | Optional external reference |
 | `counterparty_wallet_id` | integer nullable | Other wallet involved in transfers |
 | `created_at` / `updated_at` | timestamp | Audit timestamps |
 
 ## E-R Diagram
+
+The schema was modeled in [DB Designer](https://app.dbdesigner.net/). You can open or extend the same design by importing [`docs/er-diagram.sql`](./docs/er-diagram.sql) (**Import → SQL** in the designer).
+
+![Demo Credit Wallet E-R Diagram](./docs/er-diagram.svg)
+
+| Relationship | Cardinality | Description |
+| --- | --- | --- |
+| `users` → `wallets` | 1 : 1 | Each borrower has exactly one wallet (`user_id` is unique on `wallets`). |
+| `wallets` → `transactions` | 1 : N | Ledger rows for fund, withdraw, and transfer activity (`wallet_id`). |
+| `wallets` → `transactions` | 1 : N (optional) | Transfer peer link via `counterparty_wallet_id` (null for fund/withdraw). |
+
+Each borrower is a **user** with exactly **one wallet**. Every fund, withdraw, or transfer writes one or more **transactions** against that wallet. Peer-to-peer transfers link the two sides via `counterparty_wallet_id` (set on `transfer_out` / `transfer_in` rows).
+
+**Recreate or edit in DB Designer**
+
+1. Go to [app.dbdesigner.net](https://app.dbdesigner.net/).
+2. Create a project → **Import** → paste or upload [`docs/er-diagram.sql`](./docs/er-diagram.sql).
+3. Arrange tables and export PNG/PDF if you need a standalone image.
+
+Mermaid source (renders on GitHub and in many Markdown viewers):
 
 ```mermaid
 erDiagram
@@ -148,12 +169,6 @@ erDiagram
         timestamp updated_at
     }
 ```
-
-Each borrower is a **user** with exactly **one wallet** (`user_id` is unique on `wallets`). Every fund, withdraw, or transfer writes one or more **transactions** against that wallet. Peer-to-peer transfers link the two sides via `counterparty_wallet_id` (set on `transfer_out` / `transfer_in` rows; null for fund and withdraw).
-
-Relationship summary: **users (1) → (1) wallets → (many) transactions**, with `counterparty_wallet_id` pointing at the other wallet on transfers.
-
-> Optional: export a PNG/SVG from [dbdesigner.net](https://dbdesigner.net) and save as `docs/er-diagram.png`, then add `![E-R Diagram](./docs/er-diagram.png)` above the Mermaid block.
 
 ## Authentication
 
@@ -422,6 +437,41 @@ The server starts on `http://localhost:3000`.
 
 Without an API key, Karma checks are skipped for local development.
 
+### Connect to Aiven MySQL
+
+Use a **MySQL** service in the [Aiven Console](https://console.aiven.io/) (the host must look like `mysql-….a.aivencloud.com`, not `clickhouse-…`).
+
+1. Open your MySQL service → **Overview** → copy **Host**, **Port**, **User**, **Password**, and **Database name** (often `defaultdb`).
+2. Download the service **CA certificate** (`.pem`) and save it as `certs/aiven-ca.pem` in this project.
+3. Set `.env` (see `.env.example`):
+
+```env
+DB_HOST=mysql-xxxxxxxx.a.aivencloud.com
+DB_PORT=12345
+DB_USER=avnadmin
+DB_PASSWORD=your_password_from_aiven
+DB_NAME=defaultdb
+DB_SSL=true
+DB_SSL_CA=certs/aiven-ca.pem
+```
+
+4. Create tables:
+
+```bash
+npm run migrate
+```
+
+If `DB_NAME` is `defaultdb`, you can skip `npm run db:create` (Aiven already provides that database). To use `demo_credit_wallet`, create it in the Aiven console or run `npm run db:create` if your user has permission.
+
+5. Start the API and verify:
+
+```bash
+npm run dev
+curl http://localhost:3000/health
+```
+
+You should see `"database": "connected"`.
+
 ## Environment Variables
 
 | Variable | Description | Default |
@@ -432,6 +482,8 @@ Without an API key, Karma checks are skipped for local development.
 | `DB_USER` | MySQL user | `root` |
 | `DB_PASSWORD` | MySQL password | `root` |
 | `DB_NAME` | MySQL database | `demo_credit_wallet` |
+| `DB_SSL` | Enable TLS (`true` for Aiven) | `false` |
+| `DB_SSL_CA` | Path to Aiven CA `.pem` file | empty |
 | `ADJUTOR_BASE_URL` | Adjutor API base URL | `https://adjutor.lendsqr.com/v2` |
 | `ADJUTOR_API_KEY` | Adjutor bearer API key | empty |
 
